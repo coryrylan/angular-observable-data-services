@@ -2,17 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-
+import { ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { Todo, TodoService } from './../todo.service';
 
 @Component({
+  standalone: true,
   selector: 'app-todo',
   templateUrl: './todo.component.html',
-  styleUrls: ['./todo.component.css']
+  imports: [CommonModule, ReactiveFormsModule]
 })
 export class TodoComponent implements OnInit {
-  todos: Observable<Todo[]>;
-  singleTodo: Observable<Todo>;
+  todos?: Observable<Todo[]>;
+  singleTodo?: Observable<Todo>;
   todoForm: FormGroup;
 
   constructor(
@@ -28,14 +30,14 @@ export class TodoComponent implements OnInit {
     this.todos = this.todoService.todos;
     this.singleTodo = this.todoService.todos.pipe(
       map(todos => todos.find(item => item.id === '1'))
-    );
+    ) as Observable<Todo>;
 
     this.todoService.loadAll();
     this.todoService.load('1');
   }
 
   onSubmit() {
-    this.todoService.create({ value: this.todoForm.controls.todo.value });
+    this.todoService.create({ value: this.todoForm.controls['todo'].value });
   }
 
   deleteTodo(todoId: number) {
